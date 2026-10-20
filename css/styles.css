@@ -1068,11 +1068,6 @@ p {
   transform: scale(1.04);
 }
 
-.personalize__cta {
-  margin-top: 40px;
-  text-align: center;
-}
-
 /* ---------- Embalagens ---------- */
 .embalagens {
   display: grid;

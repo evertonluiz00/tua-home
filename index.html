@@ -106,8 +106,8 @@
         <ul class="nav__list">
           <li><a class="nav__link" href="#conceito">Conceito</a></li>
           <li><a class="nav__link" href="#linhas">Linhas</a></li>
-          <li><a class="nav__link" href="#catalogo">Catálogo</a></li>
           <li><a class="nav__link" href="#personalize">Personalize</a></li>
+          <li><a class="nav__link" href="#catalogo">Catálogo</a></li>
           <li><a class="nav__link" href="#embalagens">Embalagens</a></li>
           <li><a class="nav__link" href="#contato">Contato</a></li>
         </ul>
@@ -209,33 +209,8 @@
       </div>
     </section>
 
-    <!-- Catálogo -->
-    <section class="section" id="catalogo">
-      <div class="container">
-        <header class="section__head reveal">
-          <span class="eyebrow">Catálogo</span>
-          <h2 class="section__title">Toalhas &amp; kits</h2>
-          <p class="section__lead">Escolha a cor e a peça, adicione à sua lista e envie o pedido completo pelo WhatsApp.
-            Todas as peças podem ser personalizadas com bordado.</p>
-        </header>
-
-        <div class="filtros" role="group" aria-label="Filtrar produtos" id="filtros">
-          <button class="chip" type="button" data-filtro="todos" aria-pressed="true">Todos</button>
-          <button class="chip" type="button" data-filtro="unika" aria-pressed="false">Unika</button>
-          <button class="chip" type="button" data-filtro="theo" aria-pressed="false">Unika Theo</button>
-          <button class="chip" type="button" data-filtro="nuvia" aria-pressed="false">Nuvia</button>
-          <button class="chip" type="button" data-filtro="avulsa" aria-pressed="false">Toalhas avulsas</button>
-          <button class="chip" type="button" data-filtro="kit" aria-pressed="false">Kits</button>
-        </div>
-
-        <div class="produtos" id="produtos" aria-live="polite"></div>
-        <p class="catalogo__aviso" id="catalogo-aviso" hidden>Valores de referência. Confirme preço e disponibilidade
-          pelo WhatsApp.</p>
-      </div>
-    </section>
-
     <!-- Personalize -->
-    <section class="section section--areia" id="personalize">
+    <section class="section" id="personalize">
       <div class="container">
         <header class="section__head reveal">
           <span class="eyebrow">Personalize</span>
@@ -246,27 +221,6 @@
 
         <div class="bordados reveal" id="bordados"></div>
         <div class="galeria" id="galeria" aria-label="Exemplos de peças personalizadas"></div>
-
-        <div class="personalize__cta">
-          <a class="btn btn--primary" data-wa="Olá! Gostaria de personalizar toalhas com bordado. Pode me ajudar?"
-            href="#" target="_blank" rel="noopener">
-            <svg aria-hidden="true">
-              <use href="#i-whatsapp" />
-            </svg> Quero personalizar
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- Embalagens -->
-    <section class="section" id="embalagens">
-      <div class="container">
-        <header class="section__head reveal">
-          <span class="eyebrow">Para presentear</span>
-          <h2 class="section__title">Embalagens especiais</h2>
-          <p class="section__lead">O presente começa antes de abrir. Escolha a embalagem ideal para surpreender.</p>
-        </header>
-        <div class="embalagens" id="embalagens-grid"></div>
       </div>
     </section>
 
@@ -293,6 +247,43 @@
             </p>
           </li>
         </ol>
+      </div>
+    </section>
+
+    <!-- Catálogo -->
+    <section class="section" id="catalogo">
+      <div class="container">
+        <header class="section__head reveal">
+          <span class="eyebrow">Catálogo</span>
+          <h2 class="section__title">Toalhas &amp; kits</h2>
+          <p class="section__lead">Escolha a cor e a peça, adicione à sua lista e envie o pedido completo pelo WhatsApp.
+            Todas as peças podem ser personalizadas com bordado.</p>
+        </header>
+
+        <div class="filtros" role="group" aria-label="Filtrar produtos" id="filtros">
+          <button class="chip" type="button" data-filtro="todos" aria-pressed="true">Todos</button>
+          <button class="chip" type="button" data-filtro="unika" aria-pressed="false">Unika</button>
+          <button class="chip" type="button" data-filtro="theo" aria-pressed="false">Unika Theo</button>
+          <button class="chip" type="button" data-filtro="nuvia" aria-pressed="false">Nuvia</button>
+          <button class="chip" type="button" data-filtro="avulsa" aria-pressed="false">Toalhas avulsas</button>
+          <button class="chip" type="button" data-filtro="kit" aria-pressed="false">Kits</button>
+        </div>
+
+        <div class="produtos" id="produtos" aria-live="polite"></div>
+        <p class="catalogo__aviso" id="catalogo-aviso" hidden>Valores de referência. Confirme preço e disponibilidade
+          pelo WhatsApp.</p>
+      </div>
+    </section>
+
+    <!-- Embalagens -->
+    <section class="section section--areia" id="embalagens">
+      <div class="container">
+        <header class="section__head reveal">
+          <span class="eyebrow">Para presentear</span>
+          <h2 class="section__title">Embalagens especiais</h2>
+          <p class="section__lead">O presente começa antes de abrir. Escolha a embalagem ideal para surpreender.</p>
+        </header>
+        <div class="embalagens" id="embalagens-grid"></div>
       </div>
     </section>
 
