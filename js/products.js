@@ -214,11 +214,11 @@ const CATALOGO = {
 
   bordados: [
     { nome: "Branco", cor: "#FFFFFF", imagem: "cores-bordados/t-branco-pend" },
-    { nome: "Preto", cor: "#1F1B18", imagem: "cores-bordados/t-preto-pend" },
     { nome: "Prata", cor: "#A7A9AC", imagem: "cores-bordados/t-prata-pend" },
     { nome: "Dourado", cor: "#C9A86A", imagem: "cores-bordados/t-dourado-pend" },
     { nome: "Bege escuro", cor: "#A68A6D", imagem: "cores-bordados/t-bronze-pend" },
     { nome: "Marrom", cor: "#4A3426", imagem: "cores-bordados/t-marrom-pend" },
+    { nome: "Preto", cor: "#1F1B18", imagem: "cores-bordados/t-preto-pend" },
   ],
 
   // Fotos de peças personalizadas (galeria "Feito para você")
