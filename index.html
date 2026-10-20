@@ -159,7 +159,7 @@
           <span class="eyebrow">O conceito TUA</span>
           <h2 class="section__title">Enxovais personalizados &amp; presentes especiais</h2>
           <p>Acreditamos que são os detalhes que transformam uma casa em lar. Por isso, cada peça da TUA HOME é
-            escolhida com cuidado e pode levar um bordado que conta a tua história: um nome, as iniciais, um monograma.
+            escolhida com cuidado e pode levar um bordado que conta a tua história: as iniciais ou um monograma.
           </p>
           <p>Para a tua casa ou para presentear alguém especial, nós cuidamos de tudo, da toalha à embalagem.</p>
 
@@ -170,7 +170,7 @@
                 </svg></span>
               <div>
                 <h3>Bordado personalizado</h3>
-                <p>Nomes, iniciais ou monogramas em 6 cores de linha.</p>
+                <p>Iniciais ou monogramas em 6 cores de linha.</p>
               </div>
             </li>
             <li class="pilar">
@@ -240,7 +240,7 @@
         <header class="section__head reveal">
           <span class="eyebrow">Personalize</span>
           <h2 class="section__title">O bordado que faz a casa ser tua</h2>
-          <p class="section__lead">Escolha a cor da linha para o nome, as iniciais ou o monograma. Um detalhe que
+          <p class="section__lead">Escolha a cor da linha para as iniciais ou o monograma. Um detalhe que
             transforma a toalha em presente.</p>
         </header>
 
@@ -284,8 +284,8 @@
           </li>
           <li class="passo reveal">
             <h3>Personalize</h3>
-            <p>Na sua lista, ajuste as quantidades, inclua a embalagem e informe a cor do bordado e o nome ou as
-              iniciais.</p>
+            <p>Ao adicionar cada toalha, escolha a cor do bordado e as iniciais. Depois, inclua a embalagem
+              para presente.</p>
           </li>
           <li class="passo reveal">
             <h3>Finalize no WhatsApp</h3>
@@ -370,18 +370,11 @@
       <div class="lista__conteudo" id="lista-conteudo" hidden>
         <ul class="lista__itens" id="lista-itens"></ul>
 
-        <fieldset class="lista__extra">
-          <legend>Personalização (opcional)</legend>
-          <label class="campo">Cor do bordado
-            <select id="lista-bordado"></select>
-          </label>
-          <label class="campo">Nome ou iniciais
-            <input id="lista-nomes" type="text" placeholder="Ex.: Maria, M|R" autocomplete="off">
-          </label>
-          <label class="campo">Observações
+        <div class="lista__extra">
+          <label class="campo">Observações (opcional)
             <textarea id="lista-obs" rows="3" placeholder="Ex.: é para presente, data desejada para entrega…"></textarea>
           </label>
-        </fieldset>
+        </div>
       </div>
 
       <footer class="lista__footer" id="lista-footer" hidden>
@@ -398,6 +391,53 @@
         <button class="lista__limpar" id="lista-limpar" type="button">Limpar lista</button>
       </footer>
     </div>
+  </dialog>
+
+  <!-- Personalizar a toalha antes de adicionar -->
+  <dialog class="perso" id="perso" aria-labelledby="perso-titulo">
+    <form class="perso__form" id="perso-form">
+      <header class="perso__head">
+        <img class="perso__img" id="perso-img" src="" alt="" width="64" height="64">
+        <div>
+          <p class="perso__eyebrow">Personalize</p>
+          <h2 class="perso__titulo" id="perso-titulo"></h2>
+          <p class="perso__detalhe" id="perso-detalhe"></p>
+        </div>
+        <button class="lista__close" id="perso-fechar" type="button" aria-label="Fechar"><svg aria-hidden="true">
+            <use href="#i-close" />
+          </svg></button>
+      </header>
+
+      <div class="perso__body">
+        <fieldset class="seletor">
+          <legend>Cor do bordado <b id="perso-cor-nome">Sem bordado</b></legend>
+          <div class="seletor__opts perso__cores" role="radiogroup" aria-label="Cor do bordado" id="perso-cores"></div>
+        </fieldset>
+
+        <label class="campo" id="perso-iniciais-campo">Iniciais
+          <input id="perso-iniciais" class="campo__iniciais" type="text" maxlength="3" placeholder="Ex.: M ou M|R"
+            autocomplete="off" autocapitalize="characters" spellcheck="false">
+          <span class="campo__ajuda">Até 2 letras. Se preferir, combinamos depois pelo WhatsApp.</span>
+        </label>
+
+        <div class="perso__qtd" id="perso-qtd-campo">
+          <span>Quantidade</span>
+          <div class="qtd">
+            <button type="button" data-perso-qtd="-1" aria-label="Diminuir quantidade">−</button>
+            <span id="perso-qtd" aria-live="polite">1</span>
+            <button type="button" data-perso-qtd="1" aria-label="Aumentar quantidade">+</button>
+          </div>
+        </div>
+      </div>
+
+      <footer class="perso__footer">
+        <button class="btn btn--primary btn--block" type="submit">
+          <svg aria-hidden="true">
+            <use href="#i-bag" />
+          </svg> <span id="perso-salvar-label">Adicionar à lista</span>
+        </button>
+      </footer>
+    </form>
   </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite">

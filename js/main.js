@@ -99,7 +99,7 @@
           </fieldset>
           <div class="produto__footer">
             <p class="preco"></p>
-            <button class="btn btn--primary btn--block" type="button" data-add>${ICON_BAG} <span class="btn__label">Adicionar<span class="hide-xs"> à lista</span></span></button>
+            <button class="btn btn--ghost btn--sm btn--block" type="button" data-add>${ICON_BAG} <span class="btn__label">Adicionar<span class="hide-xs"> à lista</span></span></button>
           </div>
         </div>
       </article>`;
@@ -171,8 +171,7 @@
       const add = e.target.closest("[data-add]");
       if (add) {
         const v = p.variantes[state.v];
-        adicionarNaLista(chaveProduto(p, v, v.opcoes[state.o]));
-        confirmarBotao(add);
+        abrirPersonalizacao({ key: chaveProduto(p, v, v.opcoes[state.o]), btn: add });
       } else if (sw) {
         // mantém a mesma peça (ex.: "Banho") ao trocar de cor, se existir
         const nomeAtual = p.variantes[state.v].opcoes[state.o].nome;
@@ -260,31 +259,41 @@
         <div class="embalagem__body">
           <h3 class="embalagem__name">${esc(emb.nome)}</h3>
           <p class="embalagem__desc">${esc(emb.descricao)}</p>
-          <ul class="embalagem__precos">
-            ${emb.opcoes
-              .map((o) =>
-                o.texto
-                  ? `<li class="embalagem__nota">${esc(o.texto)}</li>`
-                  : `<li><span>${esc(o.nome === "Cortesia" ? "Tamanho único" : o.nome)}</span><span>${config.mostrarPrecos || o.preco === 0 ? formatPreco(o.preco) : ""}</span></li>`
-              )
-              .join("")}
-          </ul>
-          <div class="embalagem__acoes">
-            ${
-              emb.opcoes.length > 1
-                ? `<div class="seletor__opts" role="radiogroup" aria-label="Tamanho">
+          <hr class="embalagem__divisor">
+          ${
+            emb.opcoes.length > 1
+              ? `<fieldset class="seletor embalagem__seletor">
+                  <legend>Tamanho</legend>
+                  <div class="seletor__opts" role="radiogroup" aria-label="Tamanho">
                     ${emb.opcoes
                       .map((o, j) => `<button class="opcao" type="button" role="radio" aria-checked="${j === 0}" data-emb-opcao="${j}">${esc(o.nome)}</button>`)
                       .join("")}
-                  </div>`
-                : ""
-            }
+                  </div>
+                </fieldset>`
+              : ""
+          }
+          <div class="embalagem__acoes">
+            <p class="preco" data-emb-preco></p>
             <button class="btn btn--ghost btn--sm btn--block" type="button" data-add-emb="${i}">${ICON_BAG} <span class="btn__label">Adicionar<span class="hide-xs"> à lista</span></span></button>
           </div>
         </div>
       </article>`
     )
     .join("");
+
+  // Preço exibido conforme o tamanho selecionado (texto, cortesia ou valor)
+  function atualizarPrecoEmbalagem(card, emb, j) {
+    const o = emb.opcoes[j];
+    const preco = $("[data-emb-preco]", card);
+    const cortesia = o.preco === 0 && !o.texto;
+    preco.classList.toggle("preco--texto", Boolean(o.texto));
+    preco.classList.toggle("preco--linha", cortesia);
+    if (cortesia) preco.innerHTML = "<span>Tamanho único</span><span>Cortesia</span>";
+    else preco.textContent = o.texto || formatPreco(o.preco);
+    preco.hidden = !o.texto && o.preco !== 0 && !config.mostrarPrecos;
+  }
+
+  $$(".embalagem", gridEmb).forEach((card, i) => atualizarPrecoEmbalagem(card, embalagens[i], 0));
 
   gridEmb.addEventListener("click", (e) => {
     const card = e.target.closest(".embalagem");
@@ -297,6 +306,8 @@
       abrirLightbox(emb.imagens.map((path) => ({ path, alt: emb.nome, caption: emb.nome })), 0);
     } else if (opcaoBtn) {
       $$("[data-emb-opcao]", card).forEach((b) => b.setAttribute("aria-checked", String(b === opcaoBtn)));
+      const i = $$(".embalagem", gridEmb).indexOf(card);
+      atualizarPrecoEmbalagem(card, embalagens[i], Number(opcaoBtn.dataset.embOpcao));
     } else if (add) {
       const emb = embalagens[Number(add.dataset.addEmb)];
       const sel = $('[data-emb-opcao][aria-checked="true"]', card);
@@ -313,11 +324,11 @@
   function carregarLista() {
     try {
       const salvo = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      if (salvo && Array.isArray(salvo.itens)) return { bordado: "", nomes: "", obs: "", ...salvo };
+      if (salvo && Array.isArray(salvo.itens)) return { itens: salvo.itens, obs: salvo.obs || "" };
     } catch (e) {
       /* armazenamento indisponível: começa vazia */
     }
-    return { itens: [], bordado: "", nomes: "", obs: "" };
+    return { itens: [], obs: "" };
   }
 
   function salvarLista() {
@@ -358,16 +369,49 @@
     return null;
   }
 
-  // remove itens que não existem mais no catálogo
-  lista.itens = lista.itens.filter((i) => resolverItem(i.key));
+  // Itens de cortesia (preço zero) entram uma única vez, sem quantidade
+  const ehCortesia = (key) => resolverItem(key)?.preco === 0;
 
-  function adicionarNaLista(key) {
-    const item = lista.itens.find((i) => i.key === key);
-    if (item) item.qtd += 1;
-    else lista.itens.push({ key, qtd: 1 });
+  // remove itens que não existem mais no catálogo; cortesia sempre com 1 unidade
+  lista.itens = lista.itens.filter((i) => resolverItem(i.key));
+  lista.itens.forEach((i) => {
+    if (ehCortesia(i.key)) i.qtd = 1;
+    if (i.iniciais) i.iniciais = normalizarIniciais(i.iniciais); // listas salvas antes do limite de 3 caracteres
+  });
+
+  // Mesma toalha com o mesmo bordado vira um único item (soma a quantidade)
+  const mesmoItem = (a, b) =>
+    a.key === b.key && (a.bordado || "") === (b.bordado || "") && (a.iniciais || "") === (b.iniciais || "");
+
+  function adicionarNaLista(key, { qtd = 1, bordado = "", iniciais = "" } = {}) {
+    const novo = { key, qtd, bordado, iniciais };
+    const item = lista.itens.find((i) => mesmoItem(i, novo));
+    if (item && ehCortesia(key)) {
+      mostrarToast(`${resolverItem(key).nome} já está na lista`);
+      return;
+    }
+    if (item) item.qtd += qtd;
+    else lista.itens.push(novo);
     salvarLista();
     renderLista();
     mostrarToast(`${resolverItem(key).nome} adicionado à lista`);
+  }
+
+  function editarItem(index, dados) {
+    const item = lista.itens[index];
+    Object.assign(item, dados);
+    const repetido = lista.itens.findIndex((i, j) => j !== index && mesmoItem(i, item));
+    if (repetido >= 0) {
+      lista.itens[repetido].qtd += item.qtd;
+      lista.itens.splice(index, 1);
+    }
+    salvarLista();
+    renderLista();
+  }
+
+  function textoBordado(item) {
+    if (!item.bordado) return "Sem bordado";
+    return `Bordado ${item.bordado} · ${item.iniciais ? `“${item.iniciais}”` : "iniciais a definir"}`;
   }
 
   function totalLista() {
@@ -382,22 +426,23 @@
   }
 
   function mensagemLista() {
-    const itens = lista.itens.map(({ key, qtd }) => {
-      const it = resolverItem(key);
-      let linha = `• ${qtd}x ${it.nome} — ${it.detalhe}`;
+    const itens = lista.itens.map((item) => {
+      const it = resolverItem(item.key);
+      let linha = `• ${it.preco === 0 ? "" : `${item.qtd}x `}${it.nome} — ${it.detalhe}`;
       if (it.preco === 0) linha += " (cortesia)";
       else if (it.preco == null) linha += " (consultar disponibilidade)";
-      else if (config.mostrarPrecos) linha += ` — ${moeda.format(it.preco * qtd)}`;
+      else if (config.mostrarPrecos) linha += ` — ${moeda.format(it.preco * item.qtd)}`;
+      if (item.key.startsWith("p|")) {
+        linha += item.bordado
+          ? `\n   ↳ Bordado ${item.bordado}: ${item.iniciais ? `"${item.iniciais}"` : "iniciais a definir"}`
+          : "\n   ↳ Sem bordado";
+      }
       return linha;
     });
     const { total, aConsultar } = totalLista();
     const partes = ["Olá! Vi o catálogo online da TUA HOME e gostaria de fazer um pedido:", "", ...itens];
     if (config.mostrarPrecos) partes.push("", `Total estimado: ${moeda.format(total)}${aConsultar ? " + itens a consultar" : ""}`);
-    const extras = [];
-    if (lista.bordado) extras.push(`Bordado: ${lista.bordado}`);
-    if (lista.nomes.trim()) extras.push(`Nome/iniciais: ${lista.nomes.trim()}`);
-    if (lista.obs.trim()) extras.push(`Observações: ${lista.obs.trim()}`);
-    if (extras.length) partes.push("", ...extras);
+    if (lista.obs.trim()) partes.push("", `Observações: ${lista.obs.trim()}`);
     return partes.join("\n");
   }
 
@@ -420,24 +465,33 @@
     if (vazia) return;
 
     $("#lista-itens").innerHTML = lista.itens
-      .map(({ key, qtd }) => {
+      .map((item, index) => {
+        const { key, qtd } = item;
         const it = resolverItem(key);
         const unit = it.preco == null ? "A consultar" : it.preco === 0 ? "Cortesia" : `${moeda.format(it.preco)} cada`;
         const sub = it.preco ? moeda.format(it.preco * qtd) : "";
+        const perso = key.startsWith("p|")
+          ? `<p class="item__perso">${esc(textoBordado(item))} <button class="item__editar" type="button" data-editar>Editar</button></p>`
+          : "";
         return `
-        <li class="item" data-key="${esc(key)}">
+        <li class="item" data-index="${index}">
           <img class="item__img" src="${imgSm(it.imagem)}" alt="" width="64" height="64">
           <div class="item__info">
             <p class="item__nome">${esc(it.nome)}</p>
             <p class="item__detalhe">${esc(it.detalhe)}</p>
+            ${perso}
             ${config.mostrarPrecos ? `<p class="item__unit">${unit}</p>` : ""}
           </div>
           <div class="item__acoes">
-            <div class="qtd">
+            ${
+              it.preco === 0
+                ? ""
+                : `<div class="qtd">
               <button type="button" data-qtd="-1" aria-label="Diminuir quantidade de ${esc(it.nome)}">−</button>
               <span aria-live="polite">${qtd}</span>
               <button type="button" data-qtd="1" aria-label="Aumentar quantidade de ${esc(it.nome)}">+</button>
-            </div>
+            </div>`
+            }
             ${config.mostrarPrecos && sub ? `<span class="item__subtotal">${sub}</span>` : ""}
             <button class="item__remover" type="button" data-remover>Remover</button>
           </div>
@@ -452,36 +506,129 @@
     atualizarEnvio();
   }
 
-  // Quantidade e remoção
+  // Quantidade, remoção e edição do bordado
   $("#lista-itens").addEventListener("click", (e) => {
     const li = e.target.closest(".item");
     if (!li) return;
-    const item = lista.itens.find((i) => i.key === li.dataset.key);
+    const index = Number(li.dataset.index);
+    const item = lista.itens[index];
     const qtdBtn = e.target.closest("[data-qtd]");
-    if (qtdBtn) {
+    if (e.target.closest("[data-editar]")) {
+      abrirPersonalizacao({ key: item.key, index });
+      return;
+    } else if (qtdBtn) {
       item.qtd += Number(qtdBtn.dataset.qtd);
-      if (item.qtd < 1) lista.itens.splice(lista.itens.indexOf(item), 1);
+      if (item.qtd < 1) lista.itens.splice(index, 1);
     } else if (e.target.closest("[data-remover]")) {
-      lista.itens.splice(lista.itens.indexOf(item), 1);
+      lista.itens.splice(index, 1);
     } else return;
     salvarLista();
     renderLista();
   });
 
-  // Personalização
-  const campoBordado = $("#lista-bordado");
-  campoBordado.innerHTML =
-    `<option value="">Sem bordado / decidir depois</option>` +
-    bordados.map((b) => `<option value="${esc(b.nome)}">${esc(b.nome)}</option>`).join("");
-  const campos = { bordado: campoBordado, nomes: $("#lista-nomes"), obs: $("#lista-obs") };
-  Object.entries(campos).forEach(([k, el]) => {
-    el.value = lista[k];
-    el.addEventListener("input", () => {
-      lista[k] = el.value;
-      salvarLista();
-      atualizarEnvio();
-    });
+  // Observações do pedido
+  const campoObs = $("#lista-obs");
+  campoObs.value = lista.obs;
+  campoObs.addEventListener("input", () => {
+    lista.obs = campoObs.value;
+    salvarLista();
+    atualizarEnvio();
   });
+
+  /* ---------- Personalização da toalha (cor do bordado + iniciais) ---------- */
+  const persoEl = $("#perso");
+  const persoIniciais = $("#perso-iniciais");
+  let perso = null; // { key, index, btn, bordado, qtd }
+
+  $("#perso-cores").innerHTML = [{ nome: "", cor: null }, ...bordados]
+    .map((b) => {
+      const rotulo = b.nome ? esc(b.nome) : "Sem bordado";
+      return `
+      <button class="swatch${b.cor ? "" : " swatch--nenhum"}" type="button" role="radio" aria-checked="false" data-bordado="${esc(b.nome)}" aria-label="${rotulo}" title="${rotulo}">
+        <span class="dot"${b.cor ? ` style="background:${b.cor}"` : ""}></span>
+      </button>`;
+    })
+    .join("");
+
+  function atualizarPerso() {
+    $$("#perso-cores [data-bordado]").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.bordado === perso.bordado)));
+    $("#perso-cor-nome").textContent = perso.bordado || "Sem bordado";
+    $("#perso-iniciais-campo").hidden = !perso.bordado;
+    $("#perso-qtd").textContent = perso.qtd;
+  }
+
+  // Abre para adicionar (opts.btn) ou para editar um item da lista (opts.index)
+  function abrirPersonalizacao(opts) {
+    const atual = opts.index != null ? lista.itens[opts.index] : null;
+    const it = resolverItem(opts.key);
+    perso = { key: opts.key, index: opts.index ?? null, btn: opts.btn || null, bordado: atual?.bordado || "", qtd: 1 };
+    $("#perso-img").src = imgSm(it.imagem);
+    $("#perso-titulo").textContent = it.nome;
+    $("#perso-detalhe").textContent = it.detalhe;
+    persoIniciais.value = normalizarIniciais(atual?.iniciais);
+    $("#perso-salvar-label").textContent = atual ? "Salvar" : "Adicionar à lista";
+    $("#perso-qtd-campo").hidden = Boolean(atual); // na edição, a quantidade é ajustada na lista
+    atualizarPerso();
+    if (typeof persoEl.showModal === "function") persoEl.showModal();
+    else persoEl.setAttribute("open", "");
+    document.body.style.overflow = "hidden";
+  }
+
+  $("#perso-cores").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-bordado]");
+    if (!b) return;
+    perso.bordado = b.dataset.bordado;
+    atualizarPerso();
+  });
+
+  // Iniciais: até 2 letras em maiúsculas; com 2 letras aplica a máscara "M|R"
+  const letrasDe = (v) => String(v || "").toUpperCase().replace(/[^\p{L}]/gu, "").slice(0, 2);
+  const mascaraIniciais = (letras) => (letras.length === 2 ? `${letras[0]}|${letras[1]}` : letras);
+
+  function normalizarIniciais(v) {
+    return mascaraIniciais(letrasDe(v));
+  }
+
+  let iniciaisAnterior = "";
+  persoIniciais.addEventListener("focus", () => (iniciaisAnterior = persoIniciais.value));
+  persoIniciais.addEventListener("input", (e) => {
+    let letras = letrasDe(persoIniciais.value);
+    // Apagar a barra da máscara apaga a letra ao lado dela
+    if (e.inputType?.startsWith("delete") && iniciaisAnterior.includes("|") && !persoIniciais.value.includes("|") && letras.length === 2) {
+      letras = e.inputType === "deleteContentForward" ? letras[0] : letras[1];
+    }
+    const valor = mascaraIniciais(letras);
+    if (persoIniciais.value !== valor) {
+      persoIniciais.value = valor;
+      persoIniciais.setSelectionRange(valor.length, valor.length);
+    }
+    iniciaisAnterior = valor;
+  });
+
+  $("#perso-qtd-campo").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-perso-qtd]");
+    if (!b) return;
+    perso.qtd = Math.max(1, perso.qtd + Number(b.dataset.persoQtd));
+    atualizarPerso();
+  });
+
+  $("#perso-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const dados = { bordado: perso.bordado, iniciais: perso.bordado ? normalizarIniciais(persoIniciais.value) : "" };
+    if (perso.index != null) {
+      editarItem(perso.index, dados);
+    } else {
+      adicionarNaLista(perso.key, { ...dados, qtd: perso.qtd });
+      if (perso.btn) confirmarBotao(perso.btn);
+    }
+    persoEl.close();
+  });
+
+  $("#perso-fechar").addEventListener("click", () => persoEl.close());
+  persoEl.addEventListener("click", (e) => {
+    if (e.target === persoEl) persoEl.close(); // clique fora
+  });
+  persoEl.addEventListener("close", () => (document.body.style.overflow = listaEl.open ? "hidden" : ""));
 
   $("#lista-limpar").addEventListener("click", () => {
     if (!confirm("Remover todos os itens da lista?")) return;
