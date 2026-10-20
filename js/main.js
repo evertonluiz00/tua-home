@@ -581,9 +581,16 @@
     atualizarPerso();
   });
 
-  // Iniciais: até 2 letras em maiúsculas; com 2 letras aplica a máscara "M|R"
-  const letrasDe = (v) => String(v || "").toUpperCase().replace(/[^\p{L}]/gu, "").slice(0, 2);
-  const mascaraIniciais = (letras) => (letras.length === 2 ? `${letras[0]}|${letras[1]}` : letras);
+  // Iniciais: até 2 letras em maiúsculas; com 2 letras aplica a máscara "M|R".
+  // Declaradas como "function" (e não const) porque normalizarIniciais já é usada
+  // ao carregar a lista salva, antes deste ponto do arquivo.
+  function letrasDe(v) {
+    return String(v || "").toUpperCase().replace(/[^\p{L}]/gu, "").slice(0, 2);
+  }
+
+  function mascaraIniciais(letras) {
+    return letras.length === 2 ? `${letras[0]}|${letras[1]}` : letras;
+  }
 
   function normalizarIniciais(v) {
     return mascaraIniciais(letrasDe(v));
