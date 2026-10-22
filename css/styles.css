@@ -2053,3 +2053,284 @@ p {
     transform: none;
   }
 }
+
+/* ==========================================================================
+   Página Cuidados (cuidados.html)
+   ========================================================================== */
+.cuidados-hero {
+  padding: calc(var(--header-h) + clamp(40px, 7vw, 80px)) 0 clamp(56px, 8vw, 96px);
+}
+
+.cuidados-hero__grid {
+  display: grid;
+  gap: clamp(32px, 5vw, 64px);
+  align-items: center;
+}
+
+@media (min-width: 860px) {
+  .cuidados-hero__grid {
+    grid-template-columns: 1.05fr 1fr;
+  }
+}
+
+.cuidados-hero__titulo {
+  font-size: clamp(2.2rem, 6vw, 3.4rem);
+  margin-bottom: 12px;
+}
+
+.cuidados-hero__subtitulo {
+  font-family: var(--serif);
+  font-size: clamp(1.15rem, 2.6vw, 1.4rem);
+  color: var(--marrom);
+  margin-bottom: 20px;
+}
+
+.cuidados-hero__texto > p:not(.cuidados-hero__subtitulo) {
+  color: var(--texto-suave);
+}
+
+.cuidados-hero__texto > p + p:not(.cuidados-hero__subtitulo) {
+  margin-top: 14px;
+}
+
+.cuidados-hero__media img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+}
+
+/* no celular a foto vem antes do texto */
+@media (max-width: 859px) {
+  .cuidados-hero__media {
+    order: -1;
+  }
+}
+
+.dicas {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: dica;
+}
+
+@media (min-width: 760px) {
+  .dicas {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+}
+
+.dica {
+  counter-increment: dica;
+  padding: 28px 24px;
+  border-radius: var(--raio);
+  background: var(--branco);
+  box-shadow: var(--sombra-sm);
+}
+
+.dica::before {
+  content: "0" counter(dica);
+  display: block;
+  margin-bottom: 12px;
+  font-family: var(--serif);
+  font-size: 2.4rem;
+  line-height: 1;
+  color: var(--areia);
+  -webkit-text-stroke: 1px var(--marrom);
+}
+
+.dica h3 {
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+}
+
+.dica p {
+  font-size: 0.93rem;
+  color: var(--texto-suave);
+}
+
+.dica p + p {
+  margin-top: 10px;
+}
+
+.cuidados-fechamento p.cuidados-assinatura {
+  margin: -12px auto 28px;
+  font-family: var(--serif);
+  color: var(--off-white);
+}
+
+.cuidados-assinatura strong {
+  font-weight: 600;
+}
+
+.cuidados-nota {
+  padding: 28px 0;
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--texto-suave);
+}
+
+.cuidados-nota p {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* bloco com QR Code: só na impressão */
+.cuidados-qr {
+  display: none;
+}
+
+/* ---------- Impressão (cartão de cuidados em A4) ---------- */
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm 14mm;
+  }
+
+  .pagina-cuidados {
+    background: #fff;
+    font-size: 10pt;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .pagina-cuidados .header,
+  .pagina-cuidados .footer,
+  .pagina-cuidados .skip-link,
+  .pagina-cuidados .cta__flor,
+  #imprimir {
+    display: none !important;
+  }
+
+  .pagina-cuidados .container {
+    max-width: none;
+    padding: 0;
+  }
+
+  .cuidados-hero {
+    padding: 0 0 5mm;
+  }
+
+  .cuidados-hero__grid {
+    grid-template-columns: 1.4fr 1fr;
+    gap: 7mm;
+  }
+
+  .cuidados-hero__media {
+    order: 0;
+  }
+
+  .cuidados-hero__media img {
+    aspect-ratio: auto;
+    max-height: 58mm;
+    box-shadow: none;
+  }
+
+  .cuidados-hero__titulo {
+    font-size: 22pt;
+    margin-bottom: 1mm;
+  }
+
+  .cuidados-hero__subtitulo {
+    font-size: 12pt;
+    margin-bottom: 3mm;
+  }
+
+  .cuidados-hero__texto > p:not(.cuidados-hero__subtitulo) {
+    font-size: 9pt;
+    line-height: 1.45;
+  }
+
+  .cuidados-hero__texto > p + p:not(.cuidados-hero__subtitulo) {
+    margin-top: 2mm;
+  }
+
+  .pagina-cuidados .section {
+    padding: 0;
+    background: none;
+  }
+
+  .dicas {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3.5mm;
+  }
+
+  .dica {
+    padding: 3.5mm 4.5mm;
+    border: 0.3mm solid var(--linha);
+    box-shadow: none;
+    break-inside: avoid;
+  }
+
+  .dica::before {
+    margin-bottom: 1.5mm;
+    font-size: 16pt;
+  }
+
+  .dica h3 {
+    font-size: 11pt;
+    margin-bottom: 1.5mm;
+  }
+
+  .dica p {
+    font-size: 8.5pt;
+    line-height: 1.4;
+  }
+
+  .dica p + p {
+    margin-top: 1.5mm;
+  }
+
+  .cuidados-fechamento {
+    padding: 5mm 0 0;
+    background: none;
+    color: var(--marrom);
+    break-inside: avoid;
+  }
+
+  .cuidados-fechamento h2 {
+    font-size: 14pt;
+    color: var(--marrom);
+    max-width: none;
+  }
+
+  .cuidados-fechamento p,
+  .cuidados-fechamento p.cuidados-assinatura {
+    margin: 2mm auto;
+    max-width: none;
+    font-size: 9pt;
+    color: var(--texto);
+  }
+
+  .cuidados-nota {
+    padding: 2mm 0 0;
+    font-size: 7.5pt;
+  }
+
+  .cuidados-qr {
+    display: flex;
+    align-items: center;
+    gap: 5mm;
+    margin-top: 4mm;
+    padding-top: 4mm;
+    border-top: 0.3mm solid var(--linha);
+    font-size: 8.5pt;
+    color: var(--texto);
+    break-inside: avoid;
+  }
+
+  .cuidados-qr img:first-child {
+    width: 22mm;
+    height: 22mm;
+  }
+
+  .cuidados-qr .cuidados-qr__logo {
+    width: 28mm;
+    height: auto;
+    margin-left: auto;
+  }
+}

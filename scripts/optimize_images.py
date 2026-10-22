@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "images"
 OUT = ROOT / "assets" / "img"
 
-FOLDERS = ["produtos-karsten", "fotos", "cores-bordados", "embalagens", "background", "logotipo"]
+FOLDERS = ["produtos-karsten", "fotos", "cores-bordados", "embalagens", "background", "logotipo", "dicas"]
 EXTS = {".jpg", ".jpeg", ".png", ".jfif", ".webp"}
 SIZES = {"": 1600, "-sm": 640}
 SKIP = {"paleta-cores"}
@@ -101,6 +101,14 @@ def make_icons() -> None:
     print("  ícones e og-image gerados")
 
 
+def make_og_cuidados() -> None:
+    """Imagem de compartilhamento (1200x630) da página de cuidados."""
+    with Image.open(SRC / "dicas" / "toalhas-lavanderia.jfif") as img:
+        og = ImageOps.fit(to_srgb(img).convert("RGB"), (1200, 630), Image.LANCZOS)
+        og.save(OUT / "og-cuidados.jpg", quality=85, optimize=True)
+    print("  og-cuidados gerado")
+
+
 def make_transparent_logos() -> None:
     """Converte os logos (traço marrom sobre areia) em versões com fundo transparente."""
     sources = {"logo-areia-flor.png": "", "logo-areia.png": "-sem-flor"}
@@ -126,6 +134,7 @@ def main() -> None:
         print(f"[{folder}]")
         process_folder(folder)
     make_icons()
+    make_og_cuidados()
     make_transparent_logos()
     total = sum(f.stat().st_size for f in (ROOT / "assets").rglob("*") if f.is_file())
     print(f"Total em assets/: {total / 1024 / 1024:.1f} MB")
