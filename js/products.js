@@ -49,7 +49,7 @@ const CATALOGO = {
       tagline: "Leveza que seca rápido",
       gramatura: "380 g/m²",
       material: "100% algodão",
-      atributos: ["+ Leveza", "+ Volume", "+ Secagem rápida"],
+      atributos: ["+ Leveza", "+ Praticidade", "+ Secagem rápida"],
       cores: ["Branca", "Platina"],
       imagem: "produtos-karsten/banho-nuvia-platina",
     },
