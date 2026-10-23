@@ -527,7 +527,7 @@ p {
 .pilar {
   display: flex;
   gap: 16px;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .pilar__icon {
@@ -551,7 +551,10 @@ p {
   font-size: 0.98rem;
   font-weight: 600;
   color: var(--cafe);
-  margin-bottom: 2px;
+}
+
+.pilar h3 + p {
+  margin-top: 2px;
 }
 
 .pilar p {
